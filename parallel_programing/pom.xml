@@ -11,18 +11,43 @@
         <maven.compiler.target>18</maven.compiler.target>
         <exec.mainClass>com.mycompany.parallel_programing.Parallel_programing</exec.mainClass>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-corenlp</artifactId>
-            <version>4.5.7</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-corenlp</artifactId>
-            <version>4.5.7</version>
-            <classifier>models</classifier>
-        </dependency>
-    </dependencies>
+      <repositories>
+        <repository>
+            <id>zemberek-repo</id>
+            <name>zemberek Maven Repo on Github</name>
+            <url>https://raw.github.com/ahmetaa/maven-repo/master</url>
+        </repository>
+    </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>zemberek-nlp</groupId>
+      <artifactId>zemberek-core</artifactId>
+      <version>0.17.1</version>
+    </dependency>
+    <dependency>
+        <groupId>zemberek-nlp</groupId>
+        <artifactId>zemberek-morphology</artifactId>
+        <version>0.17.1</version>
+    </dependency>
+    <dependency>
+        <groupId>zemberek-nlp</groupId>
+        <artifactId>zemberek-normalization</artifactId>
+        <version>0.17.1</version>
+    </dependency>
+    <dependency>
+        <groupId>zemberek-nlp</groupId>
+        <artifactId>zemberek-tokenization</artifactId>
+        <version>0.17.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime</artifactId>
+      <version>4.7</version>
+    </dependency>
+    <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>5.7.1</version>
+    </dependency>
+  </dependencies>
 </project>
