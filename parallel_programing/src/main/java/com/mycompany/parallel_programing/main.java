@@ -6,15 +6,18 @@ import java.util.List;
 
 
 
-public class main {
-     public static void main(String[] args) throws IOException  {
-        List<List<String>> islenmis = new ArrayList<>();
-         
+public class main{
+    
+    
+     public static void main(String[] args) throws IOException  { 
         String[][] cumleler = {
             {"yapıyorum ediyorum yolluyorum etmiyorum."},
             {"Bugün hava çok güzel."},
             {"Bilgisayar mühendisliği okumak istiyorum."}
         };
+        
+        ArrayList<ArrayList<String>> islenmis = new ArrayList<ArrayList<String>>();
+
         Tokenize tokenize = new Tokenize();
         islenmis = tokenize.preprocessing(cumleler);
         

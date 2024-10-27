@@ -9,7 +9,7 @@ import zemberek.morphology.TurkishMorphology;
 import zemberek.morphology.analysis.SingleAnalysis;
 import zemberek.normalization.TurkishSentenceNormalizer;
 
-public class Tokenize {
+public class Tokenize extends main{
     
     private TurkishMorphology morphology;
     private TurkishSentenceNormalizer normalizer;
@@ -22,22 +22,28 @@ public class Tokenize {
         normalizer = new TurkishSentenceNormalizer(morphology, lookupRoot, lmFile);
     }
     
-    public List<List<String>> preprocessing(String[][] cumleler){
-        List<List<String>> islenmisCumleler = new ArrayList<>();
+    public ArrayList<ArrayList<String>> preprocessing(String[][] cumleler){
+        ArrayList<ArrayList<String>> islenmisCumleler = new ArrayList<ArrayList<String>>();
         
         for (int i = 0; i < cumleler.length; i++) {
+            System.out.println("DNEMEADA");
             String cumle = cumleler[i][0];
             System.out.println("Cümle " + (i + 1) + ": " + cumle);
             cumle = cumleKucult(cumle);
             String normalizeKelimeler = normalization(cumle);
             System.out.println("Normalize cümle " + (i + 1) + ": " + cumle);
             String[] kelimeler = kelimelereAyir(normalizeKelimeler);
-            List<String> islenmisKelimeler = new ArrayList<>();
-            
-            for (String kelime : kelimeler) {
-                String temizKelime = delNoktalama(kelime);
-                String kok = delEk(temizKelime);
-                islenmisKelimeler.add(kok);
+            System.out.println("Ayrilmis cümle " + (i + 1) + ": " + kelimeler);
+            ArrayList<String> islenmisKelimeler = new ArrayList<>();
+            try{
+                for (String kelime : kelimeler) {
+                    String temizKelime = delNoktalama(kelime);
+                    String kok = delEk(temizKelime);
+                    islenmisKelimeler.add(kok);
+                    System.out.println("kok: "+ islenmisKelimeler);
+                }
+            }catch(Exception e){
+                System.out.println("e");
             }
             islenmisCumleler.add(islenmisKelimeler);
         }
