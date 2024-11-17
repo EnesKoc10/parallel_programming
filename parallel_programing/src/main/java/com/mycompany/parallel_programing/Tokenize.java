@@ -26,7 +26,6 @@ public class Tokenize extends main{
         ArrayList<ArrayList<String>> islenmisCumleler = new ArrayList<ArrayList<String>>();
         
         for (int i = 0; i < cumleler.length; i++) {
-            System.out.println("DNEMEADA");
             String cumle = cumleler[i][0];
             System.out.println("Cümle " + (i + 1) + ": " + cumle);
             cumle = cumleKucult(cumle);
@@ -43,7 +42,7 @@ public class Tokenize extends main{
                     System.out.println("kok: "+ islenmisKelimeler);
                 }
             }catch(Exception e){
-                System.out.println("e");
+                System.out.println(" ");
             }
             islenmisCumleler.add(islenmisKelimeler);
         }

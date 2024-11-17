@@ -1,82 +1,38 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.parallel_programing;
 
-import com.opencsv.CSVReader;
-import java.io.BufferedReader;
-import java.io.FileReader;
+
+
+import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.net.URI;
+import org.datavec.api.split.FileSplit;
 
-/**
- *
- * @author Enes
- */
 public class ReadCSV {
-    private static Scanner s;
-    private static int numFields = 0;
-    private static BufferedReader in = null;
-    private static String[] fieldnames;
-    private static int[] accumulators;
-    private static String header;
-    public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
-            System.err.println("Usage: Calculate <filename>");
-            System.exit(1);
-        }
-        try {
-            in = new BufferedReader(new
-                    FileReader(args[0]));
-            header = in.readLine(); // The first line
-            numFields = calculateNumberOfFields();
-            initializeArrays();
-            String line;
-            while ((line = in.readLine()) != null) {
-                accumulateLine(line);
-            }
-            printResult();
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-        }
-    }
-    private static int calculateNumberOfFields() {
-        int count = 0;
-        Scanner s = new Scanner(header);
-        s.useDelimiter(",");
-        while (s.hasNext()) {
-            count++;
-            s.next();
-        }
-        return count;
-    }
 
-    private static void initializeArrays() {
-        fieldnames = new String[numFields];
-        accumulators = new int[numFields];
-        s = new Scanner(header);
-        s.useDelimiter(",");
-        for (int i = 0; i < numFields; i++) {
-            fieldnames[i] = s.next();
-            accumulators[i] = 0;
+    public static void main(String[] args) throws IOException {
+        c dataLocalPath = DownloaderUtility.INPUTSPLIT.Download();
+        File directoryToLook = new File(dataLocalPath, "files");
+
+        //=====================================================================
+        //                 Example 1: Loading everything within
+        //=====================================================================
+
+        /*
+          This will gather all the loadable files within the specified directory. By default it will load all the files
+          regardless of the extensions they have. Also, it will search for the inner directories recursively for
+          further loadable files.
+         */
+        FileSplit fileSplit1 = new FileSplit(directoryToLook);
+
+        /*
+          We can view the files in the file split by using the FileSplit#locations function
+         */
+
+        System.out.println("--------------- Example 1: Loading every file ---------------");
+        URI[] fileSplit1Uris = fileSplit1.locations();
+        for (URI uri : fileSplit1Uris) {
+            System.out.println(uri);
+        }
+        System.out.println("------------------------------------------------------------\n\n\n");
         }
     }
-    private static void accumulateLine(String line) {
-        s = new Scanner(line);
-        s.useDelimiter(",");
-        for (int i = 0; i < numFields; i++) {
-            if (s.hasNextInt()) {
-                accumulators[i] += s.nextInt();
-            }
-        }
-    }
-    private static void printResult() {
-        for (int i = 0; i < numFields; i++) {
-            System.out.println(fieldnames[i] + ": " + accumulators[i]);
-        }
-    }
-}
