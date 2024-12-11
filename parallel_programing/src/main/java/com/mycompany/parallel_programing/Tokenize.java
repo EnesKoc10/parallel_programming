@@ -9,7 +9,7 @@ import zemberek.morphology.TurkishMorphology;
 import zemberek.morphology.analysis.SingleAnalysis;
 import zemberek.normalization.TurkishSentenceNormalizer;
 
-public class Tokenize extends main{
+public class Tokenize{
     
     private TurkishMorphology morphology;
     private TurkishSentenceNormalizer normalizer;
@@ -22,30 +22,37 @@ public class Tokenize extends main{
         normalizer = new TurkishSentenceNormalizer(morphology, lookupRoot, lmFile);
     }
     
-    public ArrayList<ArrayList<String>> preprocessing(String[][] cumleler){
-        ArrayList<ArrayList<String>> islenmisCumleler = new ArrayList<ArrayList<String>>();
+    public ArrayList<ArrayList<String>> preprocessing(ArrayList<String> cumleler){
+        ArrayList<ArrayList<String>> islenmisCumleler = new ArrayList<>();
         
-        for (int i = 0; i < cumleler.length; i++) {
-            String cumle = cumleler[i][0];
-            System.out.println("Cümle " + (i + 1) + ": " + cumle);
+        try{
+            for (int i = 0; i < cumleler.size(); i++) {
+            String cumle = cumleler.get(i);
+            //System.out.println("Cümle " + (i + 1) + ": " + cumle);
             cumle = cumleKucult(cumle);
             String normalizeKelimeler = normalization(cumle);
-            System.out.println("Normalize cümle " + (i + 1) + ": " + cumle);
-            String[] kelimeler = kelimelereAyir(normalizeKelimeler);
-            System.out.println("Ayrilmis cümle " + (i + 1) + ": " + kelimeler);
+            //System.out.println("Normalize cümle " + (i + 1) + ": " + cumle);
+            String[] kelimeler = kelimelereAyir(normalizeKelimeler);           
             ArrayList<String> islenmisKelimeler = new ArrayList<>();
             try{
-                for (String kelime : kelimeler) {
+
+                for (String kelime : kelimeler) {                 
                     String temizKelime = delNoktalama(kelime);
                     String kok = delEk(temizKelime);
                     islenmisKelimeler.add(kok);
-                    System.out.println("kok: "+ islenmisKelimeler);
-                }
+                    //System.out.println("kok: "+ islenmisKelimeler);
+                }           
             }catch(Exception e){
-                System.out.println(" ");
+                
             }
             islenmisCumleler.add(islenmisKelimeler);
+            //System.out.println("islenmis: " + islenmisCumleler);
+            }
+        }catch(Exception ex){
+          
         }
+        
+        System.out.print("bitttti");
         return islenmisCumleler;
     }
         
