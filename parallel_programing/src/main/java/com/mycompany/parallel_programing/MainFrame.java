@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -51,7 +52,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel4.setText("Model 4:");
 
-        jButton1.setText("Modelleri Eğit");
+        jButton1.setText("Doğrulukları Göster");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -133,9 +134,15 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel8.setText(String.valueOf(accuracyList.get(3)));   
     }                                        
     
-    private static final List<Double> accuracyList = Collections.synchronizedList(new ArrayList<>());
+    private static final List<Double> accuracyList = new ArrayList<>();
     
-    public static void main(String args[]) throws InterruptedException, FileNotFoundException, IOException {
+    private static void addAccuracy(Future<Double> accuracy) throws ExecutionException, InterruptedException {
+        if (accuracy != null) {
+            accuracyList.add(accuracy.get());
+        } 
+    }
+    
+    public static void main(String args[]) throws InterruptedException, FileNotFoundException, IOException, ExecutionException {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -166,17 +173,28 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });  
         
+        // Dosya okuma
         BufferedReader comment1_br = new BufferedReader(new FileReader("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\comment1.csv"));
         BufferedReader comment2_br = new BufferedReader(new FileReader("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\comment2.csv"));
         BufferedReader comment3_br = new BufferedReader(new FileReader("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\comment3.csv"));
         BufferedReader comment4_br = new BufferedReader(new FileReader("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\comment4.csv"));
-        BufferedReader label_br = new BufferedReader(new FileReader("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\label.csv"));
+        
+        BufferedReader label1_br = new BufferedReader(new FileReader("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\label1.csv"));
+        BufferedReader label2_br = new BufferedReader(new FileReader("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\label2.csv"));
+        BufferedReader label3_br = new BufferedReader(new FileReader("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\label3.csv"));
+        BufferedReader label4_br = new BufferedReader(new FileReader("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\label4.csv"));
         
         ArrayList<String> comment1 = new ArrayList<>();
         ArrayList<String> comment2 = new ArrayList<>();
         ArrayList<String> comment3 = new ArrayList<>();
         ArrayList<String> comment4 = new ArrayList<>();
-        ArrayList<Integer> label = new ArrayList<>();
+        
+        ArrayList<Integer> label1 = new ArrayList<>();
+        ArrayList<Integer> label2 = new ArrayList<>();
+        ArrayList<Integer> label3 = new ArrayList<>();
+        ArrayList<Integer> label4 = new ArrayList<>();
+        
+        // Dosyadaki yorumları ve etiketleri arrayliste'e atama
         String line;
         while ((line = comment1_br.readLine()) != null) {
                 line = line.trim();
@@ -202,101 +220,186 @@ public class MainFrame extends javax.swing.JFrame {
             }
         comment4_br.close();
         
-         while ((line = label_br.readLine()) != null) {
+         while ((line = label1_br.readLine()) != null) {
                 line = line.trim();
                 int numara = Integer.parseInt(line);
-                label.add(numara);
+                label1.add(numara);
             }
          
-        label_br.close();
-             
-        ArrayList<Integer> label1 = new ArrayList<>();
-        ArrayList<Integer> label2 = new ArrayList<>();
-        ArrayList<Integer> label3 = new ArrayList<>();
-        ArrayList<Integer> label4 = new ArrayList<>();
+        label1_br.close();
         
+        while ((line = label2_br.readLine()) != null) {
+                line = line.trim();
+                int numara = Integer.parseInt(line);
+                label2.add(numara);
+            }
+         
+        label2_br.close();
+        
+        while ((line = label3_br.readLine()) != null) {
+                line = line.trim();
+                int numara = Integer.parseInt(line);
+                label3.add(numara);
+            }
+         
+        label3_br.close();
+        
+        while ((line = label4_br.readLine()) != null) {
+                line = line.trim();
+                int numara = Integer.parseInt(line);
+                label4.add(numara);
+            }
+         
+        label4_br.close();
+       
+        // Nesnelerin oluşturulması
         Tokenize tokenize = new Tokenize();
         convertTfidf tf = new convertTfidf();
         NeuralNetwork nn = new NeuralNetwork();
         
+        // ExecutorService oluşturuluyor
+        ExecutorService executorService  = Executors.newFixedThreadPool(4); // 4 iş parçacığı
         
-        Thread t1 = new Thread(() -> {
+        // İşlem için Future nesneleri
+        Future<Double> accuracy1 = executorService.submit(() -> {
+            long threadId = Thread.currentThread().getId();
+            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi başladı\n");
+            ArrayList<ArrayList<String>> tokenizedData = tokenize.preprocessing(comment1);
+            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi bitti\n");
+            
+            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması başladı\n");
+            // tokenizationResult.get() burada kullanılıyor, tokenization tamamlandığında çalışacak
+            ArrayList<ArrayList<Double>> tfidfResult = tf.CalculateTFIDF(tokenizedData); 
+            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması bitti\n");
+            
+            // Sinir ağını eğitiyoruz
+            double accuracy = nn.createNeuralNetwork(tfidfResult, label1);
+            return accuracy;
+            });
+        
+        Future<Double> accuracy2 = executorService.submit(() -> {
+            long threadId = Thread.currentThread().getId();
+            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi başladı\n");
+            ArrayList<ArrayList<String>> tokenizedData = tokenize.preprocessing(comment2);
+            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi bitti\n");
+            
+            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması başladı\n");
+            // tokenizationResult.get() burada kullanılıyor, tokenization tamamlandığında çalışacak
+            ArrayList<ArrayList<Double>> tfidfResult = tf.CalculateTFIDF(tokenizedData); 
+            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması bitti\n");
+            
+            // Sinir ağını eğitiyoruz
+            double accuracy = nn.createNeuralNetwork(tfidfResult, label2);
+            return accuracy;
+            });
+        
+        Future<Double> accuracy3 = executorService.submit(() -> {
+            long threadId = Thread.currentThread().getId();
+            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi başladı\n");
+            ArrayList<ArrayList<String>> tokenizedData = tokenize.preprocessing(comment3);
+            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi bitti\n");
+            
+            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması başladı\n");
+            // tokenizationResult.get() burada kullanılıyor, tokenization tamamlandığında çalışacak
+            ArrayList<ArrayList<Double>> tfidfResult = tf.CalculateTFIDF(tokenizedData); 
+            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması bitti\n");
+            
+            // Sinir ağını eğitiyoruz
+            double accuracy = nn.createNeuralNetwork(tfidfResult, label3);
+            return accuracy;
+            });
+        
+        Future<Double> accuracy4 = executorService.submit(() -> {
+            long threadId = Thread.currentThread().getId();
+            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi başladı\n");
+            ArrayList<ArrayList<String>> tokenizedData = tokenize.preprocessing(comment4);
+            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi bitti\n");
+            
+            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması başladı\n");
+            // tokenizationResult.get() burada kullanılıyor, tokenization tamamlandığında çalışacak
+            ArrayList<ArrayList<Double>> tfidfResult = tf.CalculateTFIDF(tokenizedData); 
+            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması bitti\n");
+            
+            // Sinir ağını eğitiyoruz
+            double accuracy = nn.createNeuralNetwork(tfidfResult, label4);
+            return accuracy;
+            });
+        
+        // Future<Double> değişkenlerinin değerlerini al ve listeye ekle 
+        addAccuracy(accuracy1); 
+        addAccuracy(accuracy2); 
+        addAccuracy(accuracy3);
+        addAccuracy(accuracy4);
+        
+        // ExecutorService kapatılıyor
+        executorService.shutdown();
+      
+        // MultiThreading ile pararel progamlama
+        /*Thread t1 = new Thread(() -> {
             try {
                 
-                process(comment1, label, tokenize, tf, nn);   
+                process(comment1, label1, tokenize, tf, nn);   
             } catch (Exception ex) {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
-        });
-        Thread t2 = new Thread(() -> {
+        });*/
+        /*Thread t2 = new Thread(() -> {
             try {
-                process(comment2, label, tokenize, tf, nn);
+                process(comment2, label2, tokenize, tf, nn);
             } catch (Exception ex) {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         Thread t3 = new Thread(() -> {
             try {
-                process(comment3, label, tokenize, tf, nn);
+                process(comment3, label3, tokenize, tf, nn);
             } catch (Exception ex) {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         Thread t4 = new Thread(() -> {
             try {
-                process(comment4, label, tokenize, tf, nn);
+                process(comment4, label4, tokenize, tf, nn);
             } catch (Exception ex) {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
-        });
+        });*/
         
         // Thread'leri başlatma
-        t1.start();
-        jTextArea1.insert("Thread1 başladı", 0);
-        t2.start();
-        jTextArea1.insert("Thread2 başladı", 1);
+        /*t1.start();
+        jTextArea1.append("Thread1 başladı\n");*/
+        /*t2.start();
+        jTextArea1.append("Thread2 başladı\n");
         t3.start();
-        jTextArea1.insert("Thread3 başladı", 2);
+        jTextArea1.append("Thread3 başladı\n");
         t4.start();
-        jTextArea1.insert("Thread4 başladı", 3);
+        jTextArea1.append("Thread4 başladı\n");*/
 
         // Ana thread diğer thread'lerin tamamlanmasını bekler
-        t1.join();
-        jTextArea1.insert("Thread1 bitti\n", 4);
-        t2.join();
-        jTextArea1.insert("Thread2 bitti\n", 5);
+        //t1.join();
+        //jTextArea1.append("Thread1 bitti\n");
+        /*t2.join();
+        jTextArea1.append("Thread2 bitti\n");
         t3.join();
-        jTextArea1.insert("Thread3 bitti\n", 6);
+        jTextArea1.append("Thread3 bitti\n");
         t4.join();
-        jTextArea1.insert("Thread4 bitti\n", 7);
+        jTextArea1.append("Thread4 bitti\n");*/
     }
     
-    public static void process(ArrayList<String> cumleler, ArrayList<Integer> label, Tokenize tokenize, convertTfidf tf, NeuralNetwork nn) throws Exception {
+    /*public static void process(ArrayList<String> cumleler, ArrayList<Integer> label, Tokenize tokenize, convertTfidf tf, NeuralNetwork nn) throws Exception {
         
-        /*ArrayList<ArrayList<String>> sonuc = tokenize.preprocessing(cumleler);
-        ArrayList<ArrayList<Double>> tfIdf_sonuc = tf.CalculateTFIDF(sonuc);
-        double accruracy = nn.createNeuralNetwork(tfIdf_sonuc, label); */
-        
-         // ExecutorService oluşturuluyor
-        ExecutorService executor = Executors.newFixedThreadPool(4); // 3 iş parçacığı
+        // Tokenization işlemi
+        ArrayList<ArrayList<String>> tokenizedData = tokenize.preprocessing(cumleler); // Tokenize işlemi
 
-        // İşlem için Future nesneleri
-        Future<ArrayList<ArrayList<String>>> tokenizationResult = executor.submit(() -> tokenize.preprocessing(cumleler));
-        Future<ArrayList<ArrayList<Double>>> tfidfResult = executor.submit(() -> tf.CalculateTFIDF(tokenizationResult.get()));
-
-        // Sonuçları alıyoruz
-        ArrayList<ArrayList<String>> sonuc = tokenizationResult.get();  // preprocessing tamamlandığında
-        ArrayList<ArrayList<Double>> tfIdf_sonuc = tfidfResult.get(); // TF-IDF tamamlandığında
+        // TF-IDF hesaplaması
+        ArrayList<ArrayList<Double>> tfidfResult = tf.CalculateTFIDF(tokenizedData); // TF-IDF hesaplaması
 
         // Sinir ağını eğitiyoruz
-        double accuracy = nn.createNeuralNetwork(tfIdf_sonuc, label);
-        synchronized (accuracyList) {
-            accuracyList.add(accuracy);
-        }
-        // ExecutorService kapatılıyor
-        executor.shutdown();
+        double accuracy = nn.createNeuralNetwork(tfidfResult, label);
+        accuracyList.add(accuracy);
         
-    }
+    }*/
+    
     
     // Variables declaration - do not modify                     
     private static javax.swing.JButton jButton1;
