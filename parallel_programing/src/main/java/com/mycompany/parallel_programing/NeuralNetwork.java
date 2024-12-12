@@ -19,12 +19,8 @@ public class NeuralNetwork {
     public double createNeuralNetwork( ArrayList<ArrayList<Double>> inputArray, ArrayList<Integer> label) throws Exception {
         final String SIMPLE_MODEL = new File("C:\\Users\\seros\\Desktop\\parallel_programing\\parallel_programing\\src\\main\\java\\com\\mycompany\\parallel_programing\\simple_model.h5").getAbsolutePath();
 
-        // Keras Sequential models correspond to DL4J MultiLayerNetworks. We enforce loading the training configuration
-        // of the model as well. If you're only interested in inference, you can safely set this to 'false'.
         MultiLayerNetwork model = KerasModelImport.importKerasSequentialModelAndWeights(SIMPLE_MODEL, true);
-        System.out.println("hay dedeaasda");
-        System.out.println("arrray: " + inputArray.size());
-        // Alt listeler arasında maksimum boyutu bul
+
         // Sabit giriş boyutu
         int fixedInputSize = 200;
 
@@ -35,16 +31,14 @@ public class NeuralNetwork {
             ArrayList<Double> row = inputArray.get(i);
             for (int j = 0; j < fixedInputSize; j++) {
                 if (j < row.size()) {
-                    data[i][j] = row.get(j); // Orijinal değeri al
+                    data[i][j] = row.get(j);
                 } else {
                  data[i][j] = 0.0; // Eksik değerleri sıfırla doldur
                 }
             }
         }
-             
-        System.out.println("size kac: "+ data.length);
         
-        int numClasses = 3; // Toplam sınıf sayısı
+        int numClasses = 3;
 
         // One-hot encoding için 2D array oluştur
         int[][] label_array = new int[label.size()][numClasses];
@@ -74,9 +68,8 @@ public class NeuralNetwork {
         DataSetIterator trainIter = new ListDataSetIterator<>(trainData.asList(), 2); // Mini-batch size: 2
         DataSetIterator validationIter = new ListDataSetIterator<>(validationData.asList(), 2);
         
-        // Test basic model training.
+        // Model eğitimi
         model.fit(trainIter);
-        System.out.println("Oluyooooooooooooo");
         
         // Doğrulama sonuçlarını değerlendirme
         Evaluation eval = new Evaluation();
@@ -84,7 +77,7 @@ public class NeuralNetwork {
             DataSet batch = validationIter.next();
             INDArray predicted = model.output(batch.getFeatures());
             eval.eval(batch.getLabels(), predicted);
-        }  
+        }
         
         return eval.accuracy();
     }
