@@ -5,14 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MainFrame extends javax.swing.JFrame {
     
@@ -127,6 +124,7 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>                        
 
+    // Accuracy değerlerin arayüze yazılımı
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                         
         jLabel7.setText(String.valueOf(accuracyList.get(0)));
         jLabel9.setText(String.valueOf(accuracyList.get(1)));
@@ -263,65 +261,65 @@ public class MainFrame extends javax.swing.JFrame {
         // İşlem için Future nesneleri
         Future<Double> accuracy1 = executorService.submit(() -> {
             long threadId = Thread.currentThread().getId();
-            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi başladı\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 1 - Tokenization işlemi başladı\n");
             ArrayList<ArrayList<String>> tokenizedData = tokenize.preprocessing(comment1);
-            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi bitti\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 1 - Tokenization işlemi bitti\n");
             
-            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması başladı\n");
-            // tokenizationResult.get() burada kullanılıyor, tokenization tamamlandığında çalışacak
+            jTextArea1.append("Thread " + threadId + " - Görev 1 - TF-IDF hesaplaması başladı\n");
             ArrayList<ArrayList<Double>> tfidfResult = tf.CalculateTFIDF(tokenizedData); 
-            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması bitti\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 1 - TF-IDF hesaplaması bitti\n");
             
             // Sinir ağını eğitiyoruz
             double accuracy = nn.createNeuralNetwork(tfidfResult, label1);
+            jTextArea1.append("Thread " + threadId + " - Görev 1 - Accuracy hesaplaması bitti\n");
             return accuracy;
             });
         
         Future<Double> accuracy2 = executorService.submit(() -> {
             long threadId = Thread.currentThread().getId();
-            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi başladı\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 2 - Tokenization işlemi başladı\n");
             ArrayList<ArrayList<String>> tokenizedData = tokenize.preprocessing(comment2);
-            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi bitti\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 2 - Tokenization işlemi bitti\n");
             
-            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması başladı\n");
-            // tokenizationResult.get() burada kullanılıyor, tokenization tamamlandığında çalışacak
+            jTextArea1.append("Thread " + threadId + " - Görev 2 - TF-IDF hesaplaması başladı\n");
             ArrayList<ArrayList<Double>> tfidfResult = tf.CalculateTFIDF(tokenizedData); 
-            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması bitti\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 2 - TF-IDF hesaplaması bitti\n");
             
             // Sinir ağını eğitiyoruz
             double accuracy = nn.createNeuralNetwork(tfidfResult, label2);
+            jTextArea1.append("Thread " + threadId + " - Görev 2 - Accuracy hesaplaması bitti\n");
             return accuracy;
             });
         
         Future<Double> accuracy3 = executorService.submit(() -> {
             long threadId = Thread.currentThread().getId();
-            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi başladı\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 3 - Tokenization işlemi başladı\n");
             ArrayList<ArrayList<String>> tokenizedData = tokenize.preprocessing(comment3);
-            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi bitti\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 3 - Tokenization işlemi bitti\n");
             
-            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması başladı\n");
-            // tokenizationResult.get() burada kullanılıyor, tokenization tamamlandığında çalışacak
+            jTextArea1.append("Thread " + threadId + " - Görev 3 - TF-IDF hesaplaması başladı\n"); 
             ArrayList<ArrayList<Double>> tfidfResult = tf.CalculateTFIDF(tokenizedData); 
-            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması bitti\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 3 - TF-IDF hesaplaması bitti\n");
             
             // Sinir ağını eğitiyoruz
             double accuracy = nn.createNeuralNetwork(tfidfResult, label3);
+            jTextArea1.append("Thread " + threadId + " - Görev 3 - Accuracy hesaplaması bitti\n");
             return accuracy;
             });
         
         Future<Double> accuracy4 = executorService.submit(() -> {
             long threadId = Thread.currentThread().getId();
-            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi başladı\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 4 - Tokenization işlemi başladı\n");
             ArrayList<ArrayList<String>> tokenizedData = tokenize.preprocessing(comment4);
-            jTextArea1.append("Thread " + threadId + " - Tokenization işlemi bitti\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 4 - Tokenization işlemi bitti\n");
             
-            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması başladı\n");
-            // tokenizationResult.get() burada kullanılıyor, tokenization tamamlandığında çalışacak
+            jTextArea1.append("Thread " + threadId + " - Görev 4 - TF-IDF hesaplaması başladı\n");
             ArrayList<ArrayList<Double>> tfidfResult = tf.CalculateTFIDF(tokenizedData); 
-            jTextArea1.append("Thread " + threadId + " - TF-IDF hesaplaması bitti\n");
+            jTextArea1.append("Thread " + threadId + " - Görev 4 - TF-IDF hesaplaması bitti\n");
             
             // Sinir ağını eğitiyoruz
             double accuracy = nn.createNeuralNetwork(tfidfResult, label4);
+            jTextArea1.append("Thread " + threadId + " - Görev 4 - Accuracy hesaplaması bitti\n");
             return accuracy;
             });
         
@@ -337,7 +335,6 @@ public class MainFrame extends javax.swing.JFrame {
         // MultiThreading ile pararel progamlama
         /*Thread t1 = new Thread(() -> {
             try {
-                
                 process(comment1, label1, tokenize, tf, nn);   
             } catch (Exception ex) {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
